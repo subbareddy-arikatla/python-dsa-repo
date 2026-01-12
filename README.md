@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python Learning Practice
 
 Welcome to your Python practice workspace! This repository contains practice questions to help you learn Python programming.
@@ -47,3 +48,6 @@ python3 practice_template.py
 
 Happy coding! 🐍
 
+=======
+# python-dsa-repo
+>>>>>>> origin/main
