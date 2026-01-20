@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+HEAD
 # Python Learning Practice
 
 Welcome to your Python practice workspace! This repository contains practice questions to help you learn Python programming.
@@ -50,4 +50,3 @@ Happy coding! 🐍
 
 =======
 # python-dsa-repo
->>>>>>> origin/main
