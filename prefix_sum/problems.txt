@@ -1,0 +1,52 @@
+Classic Prefix Sum Problems by Category
+✅ Basic / Easy
+
+These are foundational tasks to understand prefix sums.
+
+1-D Prefix Sum — compute the prefix sum array given an input array.
+
+Range Sum Query – Immutable (sum of elements in any subarray efficiently).
+
+Running Sum of 1d Array.
+
+Find Pivot Index (find index where sum on left = sum on right).
+
+Find Highest Altitude (prefix sum variant: cumulative sum problem).
+
+🔹 Medium Difficulty
+
+These involve combinations of prefix sums with other techniques (like hash maps, modulo, sliding window).
+
+Subarray Sum Equals K (count subarrays with sum = K).
+
+Binary Subarrays With Sum.
+
+Number of Subarrays with Odd Sum.
+
+K Radius Subarray Averages (prefix sum for sliding window).
+
+XOR Queries of a Subarray (prefix sums with XOR).
+
+Minimum Value to Get Positive Step by Step Sum.
+
+Plates Between Candles (prefix sum on strings).
+
+Left and Right Sum Differences.
+
+🧠 Advanced / Hard
+
+These often require 2D prefix sums, binary search, or advanced use of prefix arrays.
+
+2D Range Sum Query (matrix prefix sums).
+
+Number of Submatrices That Sum to Target.
+
+Count of Range Sum (prefix sum + binary search / balanced BST).
+
+Max Sum of Rectangle No Larger Than K (2D prefix + search).
+
+Minimum Cost to Make Array Equal (prefix for cumulative effects).
+
+Maximum Sum of an Hourglass (matrix prefix sums).
+
+Count Subarrays With Score Less Than K (prefix + sliding window).

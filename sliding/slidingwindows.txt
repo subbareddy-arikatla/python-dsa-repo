@@ -1,0 +1,277 @@
+ood — I’ll give you a complete A→Z guide to sliding-window algorithms:
+what the idea is, when and how to spot them, templates (with code), key variations & optimizations,
+common pitfalls, a progressive list of practice problems (easy→hard) with hints and 
+complexity, and a study plan so you can become a pro. I’ll first summarize 
+what I’ll deliver, then go through each part so you can follow and practice.
+
+What I’m doing now: I’ll explain the theory and intuition,
+show templates and three full example solutions, list many curated practice problems
+grouped by theme and difficulty (with hints), and finish with a focused study plan and 
+tips for interviews. Next: you can pick problems to practice and I can give step-by-step 
+walkthroughs or full solutions on request.
+
+Big-picture idea (intuition)
+Sliding window is a technique for problems about contiguous sequences (subarrays or substrings).
+Maintain a window [left, right) or [L, R] that “slides” over the array/string 
+while maintaining some property (sum, count, max, freq).
+
+
+Two main flavors:
+Fixed-size window: window size is predetermined (k). 
+Common tasks: sum, max in every window of size k.
+
+Variable-size window: window expands/contracts to satisfy constraints
+(e.g., smallest window with sum >= S, or longest window with <= K distinct).
+
+Complexity: sliding window usually gives O(n) or O(n log n) depending on the
+data structure (deque, hashmap, balanced tree).
+
+
+When to use sliding window — pattern checklist (how to guess) Ask these questions:
+
+Does the problem ask about subarray or substring (contiguous)? 
+If yes → candidate for sliding window.
+
+Are you asked for longest/shortest/maximum/minimum/count of contiguous subarrays/substring?
+→ likely sliding window.
+
+Does the window’s quality depend on a running aggregate
+(sum, product, count distinct, freq)? → yes.
+
+Is there no reordering allowed, or the sequence must be contiguous? → sliding window fits.
+Constraints hint: expected O(n) or O(n log n). If n up to 1e5 or higher and optimal is O(n), 
+sliding window is typical. When NOT to use sliding window:
+
+The subsequence is non-contiguous or can be re-ordered
+(then consider two-sum, sorting, DP, prefix sums).
+
+
+The window property requires global info that can't be updated in O(1)
+or amortized O(1) (unless you use a supporting structure).
+
+There are negative numbers and the property depends on arbitrary sums allowing shrinking without monotonicity (minimum-length with sum >= target with negative numbers is harder).
+Common sliding-window problem types (and core ideas)
+Fixed-size window tasks:
+Maximum/average/sum of every window of size k → maintain running sum or deque for max.
+Variable-size window (two pointers) tasks:
+Longest substring without repeating characters → expand until duplicate, then shrink until valid.
+Minimum size subarray sum >= S → expand right to reach S, then shrink left to try smaller windows.
+At most K distinct characters/elements → maintain freq map and shrink when > K.
+Count subarrays with sum equal to K (non-negative numbers → sliding window; negative allowed → prefix sum + hashmap)
+Monotonic-queue variations:
+Sliding window maximum/minimum → use deque storing indices in decreasing order.
+Subarray with max-min <= limit → maintain two deques (max and min).
+Frequency/anagram checks:
+Check if an anagram of pattern exists as substring → maintain counts in window.
+Count occurrences of permutations → sliding window with frequency compare.
+Templates (pseudocode + ready-to-use code) A. Fixed-size window (sum/avg/max via sum) Python template (sum):
+Python
+def fixed_size_window(arr, k):
+    if k > len(arr): return []
+    window_sum = sum(arr[:k])
+    results = [window_sum]
+    for i in range(k, len(arr)):
+        window_sum += arr[i] - arr[i-k]
+        results.append(window_sum)
+    return results
+Complexity: O(n).
+
+B. Variable-size window (two pointers) — general pattern
+
+Expand right pointer until constraint broken or satisfied.
+While constraint satisfied (or violated depending on objective), update answer and shrink left. Python template:
+Python
+def variable_window(arr):
+    left = 0
+    cur_state = initial_state()
+    best = initial_best()
+    for right in range(len(arr)):
+        add(cur_state, arr[right])
+        while should_shrink(cur_state):
+            # update best if objective requires
+            best = update_best(best, left, right, cur_state)
+            remove(cur_state, arr[left])
+            left += 1
+        # optionally update best after expansion
+        best = update_best(best, left, right, cur_state)
+    return best
+Implement add/remove/should_shrink/update_best per problem.
+
+C. Sliding Window Maximum (deque) Python:
+
+Python
+from collections import deque
+
+def sliding_window_max(nums, k):
+    dq = deque()  # store indices, nums[dq[i]] decreasing
+    res = []
+    for i, val in enumerate(nums):
+        # pop out of window
+        if dq and dq[0] <= i - k:
+            dq.popleft()
+        # pop smaller values
+        while dq and nums[dq[-1]] < val:
+            dq.pop()
+        dq.append(i)
+        if i >= k - 1:
+            res.append(nums[dq[0]])
+    return res
+Complexity: O(n) amortized.
+
+Three full example problems with explanation & Python code
+Example 1 — Longest Substring Without Repeating Characters (variable window)
+
+Problem: Given string s, find length of longest substring without repeating chars.
+Idea: Expand right, track frequency / last index; when duplicate, move left past previous index. Python:
+Python
+def length_of_longest_unique_substring(s):
+    last = {}  # char -> last index
+    left = 0
+    best = 0
+    for right, ch in enumerate(s):
+        if ch in last and last[ch] >= left:
+            left = last[ch] + 1
+        last[ch] = right
+        best = max(best, right - left + 1)
+    return best
+Complexity: O(n), space O(min(n, charset)).
+
+Example 2 — Minimum Size Subarray Sum (variable window)
+
+Problem: smallest length subarray with sum >= target (array of positive integers).
+Idea: Expand right to accumulate sum, then while sum >= target shrink left to find smaller windows. Python:
+Python
+def min_subarray_len(target, nums):
+    left = 0
+    cur = 0
+    best = float('inf')
+    for right, x in enumerate(nums):
+        cur += x
+        while cur >= target:
+            best = min(best, right - left + 1)
+            cur -= nums[left]
+            left += 1
+    return 0 if best == float('inf') else best
+Complexity: O(n).
+
+Example 3 — Sliding Window Maximum (deque) (See template above.) This one is essential — learn the deque pattern.
+
+Variations & advanced techniques
+Monotonic deque (max/min): keep indices in deque such that their values are monotonic. O(n).
+Two deques for max and min: used to keep track of both extremes for conditions like max-min <= limit.
+When elements can be negative: for some sum constraints sliding window breaks; use prefix sums + hashmap for exact sum K when negatives allowed.
+When order doesn’t matter or you need combinations, sliding window often not applicable.
+When counting subarrays with sum <= K for non-negative numbers you can use sliding window + counting; for negatives use prefix sums.
+Multi-character constraints: for k distinct/frequency equality problems use hashmap counters and match-counters.
+Complexity expectations
+Basic sum/count sliding window: O(n).
+Sliding window + hashmap: O(n) amortized.
+Sliding window + deque: O(n) amortized.
+If using balanced trees (e.g., to get median), cost becomes O(n log n) (e.g., sliding window median).
+Common pitfalls and corner cases
+Off-by-one on indices, choosing inclusive vs exclusive windows. Use one convention and stick with it.
+For fixed k, ensure k ≤ n case.
+For variable windows with negative numbers, sliding shrink condition may not be monotonic — sliding window may fail.
+When using dictionary for frequencies, forget to decrement/remove keys (manage counts correctly).
+For sliding window maximum, don't forget to remove indices that fell out of window (i - k).
+Initialization: best = 0 or -inf vs float('inf') depending on objective.
+Edge cases: empty array/string, k=0, k=1, all equal elements.
+How to practice: progressive problem set (grouped by concept) Below are recommended problems arranged to build skills. For each I give a one-line description and a hint/approach. (I list many problems so you can grind; solve in increasing difficulty.)
+Beginner / Warm-up (build basics)
+
+Maximum sum of any subarray of size k (sliding fixed-size) — maintain sum.
+Average of subarrays of size k — same as above.
+Minimum size subarray with sum >= S (positive integers) — variable window.
+Count number of subarrays with sum <= S (non-negative) — variable window counting.
+Longest substring with unique characters — variable window with last index.
+Data structures + frequency (hashmap) 6. Find anagram of pattern in string (does s contain permutation of p?) — frequency window. 7. Count occurrences of anagrams of p in s — sliding window + freq. 8. Longest substring with at most K distinct characters — shrink when >K. 9. Fruits into Baskets / Longest subarray with at most 2 distinct — same pattern. 10. Longest repeating character replacement (replace <= k chars to get longest repeating) — sliding & counts.
+
+Deque / Monotonic queue 11. Sliding window maximum — deque. 12. Sliding window minimum — deque. 13. Max difference in every window (max-min) — two deques. 14. Subarray with maximum value constrained (max-min <= limit) — two deques.
+
+Counting / combinatorial sliding windows 15. Number of subarrays with product < k (positive ints) — two pointers. 16. Count subarrays with sum = K (non-negatives) — sliding or prefix sum (for non-neg only). 17. Count subarrays with sum K (negatives allowed) — prefix sum + hashmap (non-window). 18. Number of substrings with exactly K distinct characters — sliding + inclusion-exclusion.
+
+Mixed / tricky 19. Minimum window substring (cover all characters of pattern) — variable window that tracks required counts. 20. Smallest substring that contains all chars from set S (minimum window covering) — same as above. 21. Longest subarray with at most K odd numbers (or at most K zeros) — sliding window counting. 22. Longest contiguous increasing subarray with constraint — not always sliding window, careful.
+
+Hard / Advanced 23. Sliding Window Median — maintain two heaps or indexed balanced tree (O(n log n)). 24. Longest subarray sum equals product? (requires more reasoning) 25. Subarrays with bounded maximum (hard counting variant). 26. Longest subarray whose average ≥ target (binary search + sliding window or prefix sums). 27. Longest substring after character replacement / dynamic patterns (hard variants). 28. Longest subarray where difference between max and min <= limit (using two deques). 29. Maximum sum subarray of size at most K with constraints (use prefix sums + min-queue). 30. Number of nice subarrays (count with odd numbers, transform and count) — practice transforms.
+
+Expert / Contest-style 31. Sliding window with dynamic cost function (maintain cost via fenwick/ordered multiset) — advanced. 32. Problems requiring combining sliding window with binary search (e.g., longest subarray with average ≥ X). 33. Streams / online sliding window requirements (compute metrics in streaming). 34. Sliding window with constraints & updates (dynamic windows as elements change) — advanced DS. 35. Problems mixing sliding window + graph/DAG constraints — edge cases.
+
+If you want direct problem sources, many of the above are found as standard problems: "Longest Substring Without Repeating Characters", "Sliding Window Maximum", "Minimum Size Subarray Sum", "Minimum Window Substring", "Subarray Product Less Than K", "Longest Substring with At Most K Distinct Characters", "Sliding Window Median", "Longest Repeating Character Replacement", "Fruits Into Baskets", "Count of Anagrams", etc.
+
+Difficulty progression plan (4-week schedule) Goal: daily practice + review; adjust to your schedule.
+Week 1 — Fundamentals (Days 1–7)
+
+Day 1: Understand fixed-size windows; implement sum/average of size k problems (3 problems).
+Day 2: Variable-size basics: min subarray sum >= S + longest unique substring (3 problems).
+Day 3: Frequency-based windows: anagrams, count permutations (3 problems).
+Day 4: Deque basics: sliding window max/min (2 problems).
+Day 5: At-most-K-distinct & fruits into baskets (3 problems).
+Day 6: Mixed review: 4 problems; time yourself.
+Day 7: Rest + read/watch references; re-solve hardest from week.
+Week 2 — Intermediate (Days 8–14)
+
+Two-pointer counting problems (count subarrays product < K).
+Minimum window substring & exact K distinct (3–4 problems).
+Sliding window + transforms (count odd numbers subarrays).
+Start one advanced: sliding window median (read solutions).
+Week 3 — Advanced patterns (Days 15–21)
+
+Combine sliding window with binary search/prefix sums.
+Sliding window median (implement).
+Max-min window problems with two deques (3 problems).
+Practice time-limited mocks: 2 full sessions.
+Week 4 — Consolidation & contest prep
+
+10 mixed problems under timed conditions.
+Implement templates from memory.
+For each problem you solved, write one clear explanation, complexity, and key corner cases.
+How to practice effectively
+Start by writing the template every time from memory.
+Dry-run examples on paper (corner cases).
+Time yourself once you understand a problem; target 20–30 min for medium-level.
+After solving, optimize and write tests for edge cases.
+Read different solutions — there’s often a cleaner way (e.g., using last index vs hashset).
+Practice at least 50 sliding-window problems across types to internalize patterns.
+Debugging & testing tips
+Print left/right indices and window state on small testcases.
+Check 0-length or full-length answers.
+For frequency maps: ensure counts are updated correctly on both add/remove.
+For deque: ensure you remove expired indices (i - k).
+For variable windows: check when you update best (before or after shrinking).
+Use asserts for invariants during development.
+Quick-reference decision flow (short)
+Contiguous subarray/substring? → sliding window possible.
+Fixed size k? → fixed-window sum or deque for max/min.
+Variable size, want best (max/min/longest/shortest) with some aggregate / count constraint? → two pointers.
+Want monotonic property (max/min)? → use deque.
+Contains negative numbers affecting monotonicity? → consider prefix sums or hashmaps instead.
+Example interview-style problems to master (a compact list to target) (Easy → Hard) — try to solve these in order, then revisit:
+Max sum of subarray of size k
+Average of subarrays of size k
+Longest unique substring
+Minimum size subarray sum >= S
+Count subarrays product < K
+Anagram substring search
+Minimum window substring (cover pattern)
+Longest substring at most K distinct
+Sliding window maximum
+Subarray with max-min <= limit
+Sliding window median
+Longest repeating character replacement
+Combine binary search + sliding window (avg ≥ X) Solve ~40–60 such problems over time and review all solutions.
+Example "from scratch" coding practice task (complete) Problem: Given an array of positive integers and integer S, find the length of the smallest contiguous subarray whose sum ≥ S. If none, return 0. We already gave code above (min_subarray_len). Key testcases:
+nums = [2,3,1,2,4,3], S=7 -> output 2 (subarray [4,3]).
+nums=[], S=1 -> 0.
+nums=[1,1,1], S=3 -> 3.
+Final tips to become a pro
+Learn three templates: fixed-size, variable-size, deque-monotonic.
+Memorize the variable-window skeleton and deque pattern.
+Practice many variants until you can identify the pattern within 1–2 minutes.
+When stuck: check if subarray/substring + contiguous + aggregate → try sliding window.
+Make a cheatsheet listing: “If asking max/min every window of size k → deque. If asking smallest length with sum ≥ S and positives → two pointers. If exact sum and negatives allowed → prefix-sum + hashmap.”
+If you want, next I can:
+
+Provide full worked solutions (step-by-step) for any subset of the problems above.
+Generate 30 concrete practice problems with input/output examples, constraints, and incremental testcases.
+Provide templates in C++, Java, or JavaScript as well. Tell me which of those you want next and I’ll produce them (I’ll generate code and walkthroughs).
+You said: what are maths topic related to sliding
