@@ -1,0 +1,168 @@
+1) When can you use Binary Search?
+A) Classic case: sorted array
+Goal: find target in sorted array a
+Property: if a[mid] < target, then target (if exists) must be on the right
+
+
+B) More powerful case: Binary Search on Answer (Parametric Search)
+You are not searching an array index; you are searching an answer value (like minimum speed, minimum days, maximum capacity).
+You create a function ok(x):
+ok(x) = true means “answer is possible with x”
+ok(x) = false means “not possible”
+If ok(x) is monotonic (once it becomes true, it stays true), you can binary search x.
+This is how many “hard” binary search problems are actually solved.
+
+2) How to पहचान/guess “This is binary search problem”?
+Use binary search if you see these signals:
+
+[sorted/rotated] Input is sorted OR “nearly sorted”, “rotated sorted array”
+[first/last occurrence] “Find first/last position”, “lower bound/upper bound”
+[minimum/maximum feasible] “Minimum possible X such that …”, “Maximum possible X such that …”
+[monotonic statement] “If you can do it in X, you can do it in X+1” (or reverse)
+[answer range is big] constraints like 1..1e9 for answer, but you can check feasibility in O(n) — that screams binary search on answer
+3) Core patterns you must master
+Pattern 1: Exact search in sorted array
+Time: O(log n)
+
+Pattern 2: Lower bound (first position where a[i] >= target)
+Used in:
+
+first occurrence
+insertion position
+count of elements < target
+Pattern 3: Upper bound (first position where a[i] > target)
+Used in:
+
+last occurrence
+count of elements <= target
+Pattern 4: Binary search on answer
+Used in:
+
+“minimum feasible”
+“maximize minimum”
+scheduling/capacity/speed type problems
+Pattern 5: Peak / unimodal array
+Array increases then decreases (mountain). Use binary search with slope comparisons.
+
+4) Correct code templates (most important)
+A) Classic binary search (iterative, JavaScript)
+js
+function binarySearch(arr, target) {
+  let l = 0, r = arr.length - 1; // inclusive
+  while (l <= r) {
+    const mid = l + Math.floor((r - l) / 2);
+    if (arr[mid] === target) return mid;
+    if (arr[mid] < target) l = mid + 1;
+    else r = mid - 1;
+  }
+  return -1;
+}
+B) Lower bound (first index with value >= target)
+js
+function lowerBound(arr, target) {
+  let l = 0, r = arr.length; // r is exclusive
+  while (l < r) {
+    const mid = l + Math.floor((r - l) / 2);
+    if (arr[mid] >= target) r = mid;
+    else l = mid + 1;
+  }
+  return l; // in [0..n]
+}
+C) Upper bound (first index with value > target)
+js
+function upperBound(arr, target) {
+  let l = 0, r = arr.length;
+  while (l < r) {
+    const mid = l + Math.floor((r - l) / 2);
+    if (arr[mid] > target) r = mid;
+    else l = mid + 1;
+  }
+  return l;
+}
+D) Binary search on answer (minimum x such that ok(x)=true)
+js
+function minTrue(lo, hi, ok) {
+  // search in [lo, hi] inclusive
+  let l = lo, r = hi;
+  while (l < r) {
+    const mid = l + Math.floor((r - l) / 2);
+    if (ok(mid)) r = mid;
+    else l = mid + 1;
+  }
+  return l;
+}
+5) Common mistakes (avoid these and you become “pro” faster)
+[wrong boundaries] mixing inclusive/exclusive (l<=r vs l<r)
+[infinite loop] not moving l/r correctly (l=mid instead of l=mid+1)
+[mid overflow] in some languages: use mid = l + (r-l)/2
+[unsorted data] classic binary search requires sorted array
+[predicate not monotonic] binary search on answer fails if ok(x) is not monotonic
+6) Practice set (Easy -> Hard) to become strong
+Below is a curated “roadmap list”. Try in this order. (You can find these on platforms like LeetCode / HackerRank / Codeforces by title.)
+
+Level 1: Fundamentals (classic + bounds)
+[Binary Search] Find target in sorted array
+[Search Insert Position] return insertion index
+[First and Last Position of Element] first/last occurrence
+[Count occurrences] using lower/upper bound difference
+[Floor/Ceil in sorted array] greatest <= x, smallest >= x
+[Find smallest letter greater than target] (wrap-around)
+Level 2: Rotated / tricky arrays
+[Search in Rotated Sorted Array] no duplicates
+[Search in Rotated Sorted Array II] with duplicates
+[Find Minimum in Rotated Sorted Array]
+[Find Minimum in Rotated Sorted Array II]
+[Single Element in a Sorted Array] pairs pattern (index parity trick)
+Level 3: Peaks / “mountain” style
+[Peak Element]
+[Find Peak in Mountain Array]
+[Search in Mountain Array] (two binary searches)
+Level 4: Binary Search on Answer (MOST important for interviews)
+[Sqrt(x)] integer square root (search answer)
+[Koko Eating Bananas] min speed
+[Capacity To Ship Packages Within D Days] min capacity
+[Minimum Days to Make m Bouquets] min days
+[Split Array Largest Sum] min possible maximum subarray sum
+[Aggressive Cows / Maximize minimum distance] classic
+[Allocate Minimum Pages] classic
+[Painter’s Partition] classic
+[Median of Two Sorted Arrays] (advanced binary search on partition)
+[Kth smallest in sorted matrix] (binary search on value + counting)
+[Kth smallest pair distance] (binary search + two pointers)
+Level 5: 2D / matrix binary search patterns
+[Search a 2D Matrix] treat as 1D
+[Search a 2D Matrix II] (often solved via staircase, but BS variants exist)
+[Kth smallest in multiplication table] value search + count
+7) A simple “rule” to choose the right variant
+If question says find target in sorted array
+-> Classic binary search
+If question says first/last/insert
+-> Lower bound / upper bound
+If question says minimum x such that possible / feasible
+-> Binary search on answer
+If question says peak / mountain
+-> Compare mid with neighbor (arr[mid] < arr[mid+1] etc.)
+8) If you want, I can make this a structured training plan for you
+Tell me:
+
+[language] Java / JavaScript / Python?
+[level] beginner / intermediate?
+[platform] LeetCode or any other?
+[time] how many days (7/14/30)?
+Then I’ll give you a day-wise problem list + the exact patterns you should learn each day.
+
+Status
+Completed: Explained binary search from basics to advanced, how to identify it, core templates, common pitfalls, and a strong practice roadmap.
+Feedback submitted
+
+
+
+
+Command Awaiting Approval
+hai
+
+
+
+
+
+
