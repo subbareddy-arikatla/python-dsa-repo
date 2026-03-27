@@ -103,3 +103,22 @@ visited=[False] * n
 for i in range(n):
     if not visited[i]:
         bfs(i,adj,visited)
+def bfss(start,adj,visted):
+    k=deque([start])
+    visted[start]=True
+    while q:
+        node=q.popleft()
+        print(node)
+
+
+adj = [
+    [1],
+    [],
+    [3],
+    []
+]
+n=len(adj)
+visited=[False]*n
+for i in range(n):
+    if not visited[i]:
+        bfs(i,adj,visited)
